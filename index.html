@@ -1,0 +1,2206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#050D2B">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2730%27 fill=%27%230A3FB0%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2714%27 fill=%27%23F5B800%27/%3E%3C/svg%3E">
+<title>Dashboard Statistik Pemain PERSIB Bandung 2026/27</title>
+<meta name="description" content="Dashboard statistik pemain PERSIB Bandung musim 2026/27: gol, assist, menit, penampilan, efisiensi per 90 menit, dan kurva pemain. Data realtime dari Google Sheets.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#0A3FB0; --blue-d:#06236B; --navy:#050D2B; --sky:#2F7BFF; --gold:#F5B800; --gold-d:#C99600;
+  --ink:#0F1B3D; --mut:#5B6B94; --bg:#EEF3FC; --card:#fff; --line:#DCE5F6; --soft:#F5F8FE;
+  --green:#16A34A; --red:#E11D48; --amber:#D97706;
+  --r:18px; --shadow:0 1px 2px rgba(10,35,107,.06),0 8px 24px rgba(10,35,107,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,p{margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px}
+[hidden]{display:none!important}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,#06123A,#050D2B);border-bottom:3px solid var(--gold);box-shadow:0 6px 20px rgba(5,13,43,.35)}
+.top .wrap{display:flex;align-items:center;gap:18px;min-height:60px;flex-wrap:wrap;padding-top:6px;padding-bottom:6px}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;letter-spacing:.02em;font-size:15px;white-space:nowrap}
+.brand i{width:12px;height:12px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(245,184,0,.25)}
+.brand span{color:var(--sky)}
+nav{display:flex;gap:4px;flex:1;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{appearance:none;border:0;background:transparent;color:#B9C6EA;font:inherit;font-weight:600;font-size:14px;padding:9px 14px;border-radius:10px;cursor:pointer;white-space:nowrap;transition:.15s}
+nav button:hover{color:#fff;background:rgba(255,255,255,.08)}
+nav button[aria-selected=true]{color:var(--navy);background:var(--gold)}
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#DCE6FF;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);padding:6px 12px;border-radius:99px;white-space:nowrap;cursor:pointer}
+.pill:hover{background:rgba(255,255,255,.14)}
+.pill .dot{width:9px;height:9px;border-radius:50%;background:#94A3B8}
+.pill.live .dot{background:#22C55E;box-shadow:0 0 0 0 rgba(34,197,94,.7);animation:ping 2s infinite}
+.pill.warn .dot{background:#F59E0B}
+.pill.busy .dot{background:var(--sky);animation:ping 1s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+
+/* ---------- hero ---------- */
+.hero{display:block;width:100%;height:auto;border-radius:0 0 22px 22px;box-shadow:var(--shadow)}
+.heroWrap{max-width:1240px;margin:0 auto;padding:0 20px}
+.heroWrap .hero{border-radius:0 0 24px 24px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 4px}
+.chip{display:inline-flex;gap:6px;align-items:center;background:#fff;border:1px solid var(--line);color:var(--blue-d);font-weight:600;font-size:13px;padding:6px 12px;border-radius:99px}
+.chip b{color:var(--ink)}
+
+/* ---------- layout ---------- */
+main{padding:8px 0 60px}
+section.tab{animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}}
+.sec-h{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:34px 0 14px}
+.sec-h h2{font-size:20px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.sec-h h2::before{content:"";width:5px;height:22px;border-radius:3px;background:linear-gradient(var(--gold),var(--gold-d))}
+.sec-h p{color:var(--mut);font-size:13.5px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g6{grid-template-columns:repeat(6,minmax(0,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;min-width:0}
+.card h3{font-size:14px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--blue-d);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card h3 small{font-weight:600;color:var(--mut);letter-spacing:0;text-transform:none;font-size:12px}
+.note{font-size:12.5px;color:var(--mut);margin-top:10px}
+
+/* ---------- KPI ---------- */
+.kpi{position:relative;overflow:hidden;color:#fff;border:0;background:linear-gradient(135deg,var(--blue) 0%,var(--blue-d) 100%);padding:18px 18px 16px}
+.kpi::after{content:"";position:absolute;right:-26px;top:-26px;width:96px;height:96px;border-radius:50%;background:rgba(255,255,255,.07)}
+.kpi:nth-child(even){background:linear-gradient(135deg,#0E4FD6 0%,#0A3FB0 100%)}
+.kpi .l{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#BFD0FF}
+.kpi .v{font-size:34px;font-weight:800;line-height:1.15;margin-top:6px;letter-spacing:-.02em;color:#fff}
+.kpi.gold .v{color:var(--navy)}
+.kpi.gold{background:linear-gradient(135deg,var(--gold),#E0A200);color:var(--navy)}
+.kpi.gold .l{color:#4A3900}
+.kpi.gold::after{background:rgba(255,255,255,.25)}
+
+/* ---------- sorotan ---------- */
+.spot{display:flex;gap:16px;align-items:center;background:linear-gradient(120deg,#fff 55%,#EAF1FF)}
+.spot .t{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--gold-d);text-transform:uppercase}
+.spot .n{font-size:20px;font-weight:800;line-height:1.2;margin:4px 0}
+.spot .s{color:var(--mut);font-size:14px;font-weight:600}
+.spot .s b{color:var(--blue);font-size:22px;font-weight:800}
+
+/* ---------- avatar ---------- */
+.av{position:relative;display:inline-grid;place-items:center;overflow:hidden;border-radius:50%;background:linear-gradient(160deg,#CFE0FF,#7EA6F5);flex:none;color:#fff;font-weight:800;vertical-align:middle}
+.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 14%}
+.av.sm{width:30px;height:30px;font-size:11px}
+.av.md{width:48px;height:48px;font-size:15px}
+.av.lg{width:92px;height:92px;border-radius:20px;font-size:28px}
+.av.cd{width:86px;height:112px;border-radius:16px;font-size:26px}
+.av.cmp{width:110px;height:140px;border-radius:18px;font-size:32px}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto;margin:0 -4px;padding:0 4px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);text-align:left;padding:8px 10px;border-bottom:2px solid var(--line);white-space:nowrap;background:#fff}
+td{padding:8px 10px;border-bottom:1px solid #EDF2FB;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:#F6F9FF}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+td.c,th.c{text-align:center}
+.pl{display:flex;align-items:center;gap:10px;font-weight:700;min-width:150px}
+#d-body .pl,#a-eff .pl{white-space:nowrap}
+.rk{width:30px;font-weight:800;color:var(--mut);text-align:center}
+.rk i{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;font-style:normal;font-size:12px}
+tr.r1 .rk i{background:var(--gold);color:var(--navy)}
+tr.r2 .rk i{background:#DDE5F7;color:var(--blue-d)}
+tr.r3 .rk i{background:#F1D9BF;color:#7A4A12}
+.v{font-weight:800;color:var(--blue);font-variant-numeric:tabular-nums}
+.pos{display:inline-block;min-width:34px;text-align:center;font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:99px}
+.pos.GK{background:#FFF1C2;color:#7A5A00}
+.pos.DF{background:#DCEBFF;color:#0A3FB0}
+.pos.MF{background:#E3E0FF;color:#3D2FA6}
+.pos.FW{background:#FFE0E6;color:#B1123B}
+.dim{color:#9AA7C7}
+.ok{color:var(--green);font-weight:800}
+.bad{color:var(--red);font-weight:800}
+th.sort{cursor:pointer;user-select:none}
+th.sort:hover{color:var(--blue)}
+th.sort[data-d]::after{content:" ▲";color:var(--gold-d);font-size:10px}
+th.sort[data-d="-1"]::after{content:" ▼"}
+tr.tot td{font-weight:800;background:var(--soft)}
+
+/* ---------- controls ---------- */
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
+.tools input[type=search],.tools input[type=number],.tools select,select.s{font:inherit;font-size:14px;font-weight:600;padding:9px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);min-width:0}
+.tools input:focus,.tools select:focus,select.s:focus{outline:2px solid var(--sky);outline-offset:1px}
+.tools input[type=search]{flex:1;min-width:200px;max-width:340px}
+.tools input[type=number]{width:96px}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg button{appearance:none;border:0;background:transparent;font:inherit;font-weight:700;font-size:13px;color:var(--mut);padding:6px 12px;border-radius:9px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--blue);color:#fff}
+
+/* ---------- charts ---------- */
+.chart{width:100%;min-height:40px;margin-top:12px}
+.svg-chart{display:block;max-width:100%;overflow:visible}
+.svg-chart text{font-family:inherit}
+.svg-chart .lab{font-size:12px;fill:var(--ink);font-weight:700}
+.svg-chart .val{font-size:12px;fill:var(--blue-d);font-weight:800}
+.svg-chart .track{fill:#EAF0FC}
+.svg-chart .grid{stroke:#E3EAF8;stroke-width:1}
+.svg-chart .ax{font-size:11px;fill:var(--mut);font-weight:600}
+.svg-chart .cat{font-size:12px;fill:var(--ink);font-weight:700}
+.svg-chart .bar,.svg-chart .vbar{transform-box:fill-box}
+.svg-chart .bar{transform-origin:left center;animation:grow .75s cubic-bezier(.2,.7,.2,1) both}
+.svg-chart .vbar{transform-origin:center bottom;animation:rise .75s cubic-bezier(.2,.7,.2,1) both}
+.svg-chart .ln{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 1s .2s ease forwards}
+@keyframes grow{from{transform:scaleX(0)}}
+@keyframes rise{from{transform:scaleY(0)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+.svg-chart g.h:hover .bar,.svg-chart g.h:hover .vbar{filter:brightness(1.12)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 8px;font-size:12.5px;font-weight:700;color:var(--ink)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.legend i.l{height:4px;width:16px;border-radius:2px}
+
+/* ---------- lini ---------- */
+.lini{display:grid;grid-template-columns:minmax(240px,340px) 1fr;gap:24px;align-items:center}
+.insight{margin-top:12px;background:linear-gradient(90deg,#FFF6D6,#FFFBEA);border:1px solid #F5E2A0;border-radius:12px;padding:10px 14px;font-weight:700;color:#5C4400;font-size:14px}
+
+/* ---------- compare ---------- */
+.cmpHead{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px}
+.cmpP{display:flex;gap:14px;align-items:center}
+.cmpP .nm{font-size:18px;font-weight:800;line-height:1.2}
+.cmpP.b{flex-direction:row-reverse;text-align:right}
+td.win{background:#FFF6D6;font-weight:800;color:#6B4E00}
+
+/* ---------- kurva ---------- */
+.pcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.pc .hd{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.pc .nm{font-size:18px;font-weight:800;line-height:1.2}
+.pc .sub{color:var(--mut);font-weight:600;font-size:13.5px;margin-top:2px}
+.pc .big{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.pc .big span{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:3px 10px;font-size:12.5px;font-weight:700}
+.pc .big b{color:var(--blue)}
+.pc table{font-size:13px;margin-bottom:10px}
+.pc td,.pc th{padding:5px 8px}
+.empty{padding:26px;text-align:center;color:var(--mut);font-weight:600}
+
+/* ---------- misc ---------- */
+.notes{margin:0;padding-left:20px;color:#3C4B73;font-size:14px}
+.notes li{margin:5px 0}
+footer{color:var(--mut);font-size:12.5px;text-align:center;padding:10px 20px 40px}
+footer b{color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:12px;font-weight:600;font-size:13.5px;box-shadow:0 10px 30px rgba(0,0,0,.3);z-index:99}
+
+@media (max-width:1020px){
+  .g6{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .g3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pcards{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  .wrap,.heroWrap{padding:0 14px}
+  .g2,.g3,.lini{grid-template-columns:1fr}
+  .g6{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi .v{font-size:28px}
+  .top .wrap{gap:8px}
+  .brand{font-size:14px}
+  nav{order:3;flex-basis:100%}
+  .cmpHead{grid-template-columns:1fr}
+  .cmpP.b{flex-direction:row;text-align:left}
+  .card{padding:14px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .svg-chart .ln{stroke-dashoffset:0}
+}
+
+dialog{border:0;border-radius:20px;padding:24px;width:min(560px,92vw);box-shadow:0 30px 80px rgba(5,13,43,.45);color:var(--ink);font-family:inherit}
+dialog::backdrop{background:rgba(5,13,43,.6);backdrop-filter:blur(3px)}
+dialog h3{font-size:18px;font-weight:800;margin-bottom:6px}
+dialog .dsub{color:var(--mut);font-size:14px;margin-bottom:14px}
+dialog label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
+dialog input{width:100%;font:inherit;font-size:14px;padding:11px 14px;border:1px solid var(--line);border-radius:12px}
+dialog input:focus{outline:2px solid var(--sky);outline-offset:1px}
+.dmsg{min-height:20px;font-size:13px;font-weight:700;margin:8px 0}
+.dmsg.ok{color:var(--green)}.dmsg.err{color:var(--red)}
+.drow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.drow button{font:inherit;font-weight:700;font-size:13.5px;padding:9px 14px;border-radius:12px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--blue-d)}
+.drow .b1{background:var(--blue);color:#fff;border-color:var(--blue)}
+.dsteps{margin:0 0 10px;padding-left:20px;font-size:13px;color:#3C4B73}
+.dsteps li{margin:4px 0}
+.dnote{font-size:12.5px;color:var(--mut);background:var(--soft);border-radius:10px;padding:10px 12px}
+dialog code{background:#EAF0FC;padding:1px 6px;border-radius:6px;font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- gradien dipakai grafik -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="gBlue" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2F7BFF"/><stop offset="1" stop-color="#0A3FB0"/></linearGradient>
+    <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFD54A"/><stop offset="1" stop-color="#E0A200"/></linearGradient>
+    <linearGradient id="gBlueV" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#0A3FB0"/><stop offset="1" stop-color="#2F7BFF"/></linearGradient>
+    <linearGradient id="gGoldV" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#E0A200"/><stop offset="1" stop-color="#FFD54A"/></linearGradient>
+    <linearGradient id="gSkyV" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#9DBDFF"/><stop offset="1" stop-color="#CFE0FF"/></linearGradient>
+    <linearGradient id="gNavyV" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#050D2B"/><stop offset="1" stop-color="#26418F"/></linearGradient>
+  </defs>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><i></i>PERSIB <span>ANALYTICS</span></div>
+    <nav role="tablist" aria-label="Menu dashboard">
+      <button role="tab" data-tab="ringkasan" aria-selected="true">Ringkasan</button>
+      <button role="tab" data-tab="analisis" aria-selected="false">Analisis Pro</button>
+      <button role="tab" data-tab="kurva" aria-selected="false">Kurva Pemain</button>
+      <button role="tab" data-tab="data" aria-selected="false">Data Pemain</button>
+    </nav>
+    <button class="pill" id="cfgBtn" title="Tempel link Google Sheets">🔗 Sumber Data</button>
+    <button class="pill busy" id="pill" title="Klik untuk memuat ulang data sekarang"><span class="dot"></span><span id="pillTxt">Memuat data…</span></button>
+  </div>
+</header>
+
+<div class="heroWrap" id="heroWrap">
+  <img class="hero" src="assets/banner.jpg" alt="PERSIB Bandung, statistik pemain BRI Super League 2026/27, Stadion Gelora Bandung Lautan Api">
+</div>
+
+<main class="wrap">
+  <div class="meta" id="meta"></div>
+
+  <!-- ============ RINGKASAN ============ -->
+  <section class="tab" id="tab-ringkasan">
+    <div class="grid g6" id="r-kpi" style="margin-top:18px"></div>
+
+    <div class="sec-h"><h2>Sorotan Musim Ini</h2></div>
+    <div class="grid g3" id="r-sorotan"></div>
+
+    <div class="sec-h"><h2>Peringkat Pemain</h2><p>Top 5 di setiap kategori</p></div>
+    <div class="grid g3" id="r-rank"></div>
+
+    <div class="sec-h"><h2>Grafik Top 5</h2></div>
+    <div class="grid g3" id="r-charts"></div>
+
+    <div class="sec-h"><h2>Kontribusi Gol per Lini</h2><p>GK · DF · MF · FW</p></div>
+    <div class="card" id="r-lini"></div>
+  </section>
+
+  <!-- ============ ANALISIS PRO ============ -->
+  <section class="tab" id="tab-analisis" hidden>
+    <div class="grid g6" id="a-kpi" style="margin-top:18px;grid-template-columns:repeat(5,minmax(0,1fr))"></div>
+
+    <div class="sec-h"><h2>Analisis Berdasarkan Posisi dan Kompetisi</h2></div>
+    <div class="grid g2">
+      <div class="card" id="a-posisi"></div>
+      <div class="card" id="a-komp"></div>
+    </div>
+
+    <div class="sec-h"><h2>Ranking Efisiensi per 90 Menit</h2></div>
+    <div class="tools">
+      <label for="minMenit" style="font-weight:700;font-size:14px">Minimal menit bermain</label>
+      <input type="number" id="minMenit" min="0" step="30" value="270">
+      <span class="note" style="margin:0">Pemain di bawah batas ini tidak diikutkan agar angka per 90 menit tidak menyesatkan (270 menit = 3 laga penuh). Isi 0 untuk menyertakan semua pemain.</span>
+    </div>
+    <div class="grid g2" id="a-rank"></div>
+
+    <div class="sec-h"><h2>Player Comparison</h2><p>Pilih dua pemain untuk dibandingkan</p></div>
+    <div class="card">
+      <div class="tools">
+        <select class="s" id="cmpA" aria-label="Pemain A"></select>
+        <span style="font-weight:800;color:var(--mut)">vs</span>
+        <select class="s" id="cmpB" aria-label="Pemain B"></select>
+      </div>
+      <div id="a-cmp"></div>
+    </div>
+
+    <div class="sec-h"><h2>Efisiensi Pemain — Metrik per 90 Menit</h2><p>Klik judul kolom untuk mengurutkan</p></div>
+    <div class="card"><div class="tw" id="a-eff"></div></div>
+
+    <div class="sec-h"><h2>Catatan Kualitas Data</h2></div>
+    <div class="card"><ul class="notes" id="a-notes"></ul></div>
+  </section>
+
+  <!-- ============ KURVA PEMAIN ============ -->
+  <section class="tab" id="tab-kurva" hidden>
+    <div class="sec-h"><h2>Kurva Performa Pemain</h2><p>Gol, assist, kartu kuning, penampilan, dan menit di Super League, ACL Two, dan ASEAN</p></div>
+    <div class="tools">
+      <input type="search" id="kSearch" placeholder="Cari nama pemain…" aria-label="Cari pemain">
+      <div class="seg" id="kPos" role="group" aria-label="Filter posisi"></div>
+    </div>
+    <div class="pcards" id="k-grid"></div>
+    <p class="note">Kurva menghubungkan tiga kompetisi (bukan per pertandingan), karena belum ada data per laga. Kartu kuning ACL Two yang kosong ditampilkan sebagai “-” (belum tersedia), bukan nol; tanda * pada total kuning berarti total belum termasuk kompetisi tersebut.</p>
+  </section>
+
+  <!-- ============ DATA PEMAIN ============ -->
+  <section class="tab" id="tab-data" hidden>
+    <div class="sec-h"><h2>Data Seluruh Pemain</h2><p id="d-sub"></p></div>
+    <div class="tools">
+      <input type="search" id="dSearch" placeholder="Cari nama pemain…" aria-label="Cari pemain">
+      <div class="seg" id="dPos" role="group" aria-label="Filter posisi"></div>
+    </div>
+    <div class="card"><div class="tw" id="d-body"></div></div>
+    <p class="note">Kolom “Cek” membandingkan angka sheet Data dengan jumlah tiga kompetisi di sheet Kompetisi. “Beda” berarti ada selisih yang perlu dicek sumbernya.</p>
+  </section>
+</main>
+
+<footer id="foot"></footer>
+
+<dialog id="dlg" aria-labelledby="dlgT">
+  <h3 id="dlgT">Sumber Data (Google Sheets)</h3>
+  <p class="dsub">Tempel link Google Sheets yang berisi data pemain. Setelah itu dashboard otomatis ikut berubah setiap kali Anda mengedit sheet.</p>
+  <label for="shInput">Link Google Sheets</label>
+  <input type="text" id="shInput" placeholder="https://docs.google.com/spreadsheets/d/.../edit" autocomplete="off" spellcheck="false">
+  <p id="shMsg" class="dmsg" role="status"></p>
+  <div class="drow">
+    <button type="button" class="b1" id="shSave">Simpan &amp; hubungkan</button>
+    <button type="button" class="b2" id="shCopy">Salin link dashboard</button>
+    <button type="button" class="b2" id="shReset">Pakai data bawaan</button>
+    <button type="button" class="b2" id="shClose">Tutup</button>
+  </div>
+  <ol class="dsteps">
+    <li>Buka Google Sheets Anda, klik <b>Bagikan</b> &gt; Akses umum &gt; <b>Siapa saja yang memiliki link</b> &gt; peran <b>Pelihat</b>.</li>
+    <li>Salin link dari kolom alamat browser, tempel di atas.</li>
+    <li>Tab di sheet harus bernama <b>Data</b>, <b>Kompetisi</b>, <b>Info</b> (pakai file <code>DATA_PERSIB.xlsx</code>).</li>
+  </ol>
+  <p class="dnote">Link yang ditempel di sini tersimpan di browser ini saja. Agar dosen atau orang lain langsung melihat data live, klik <b>Salin link dashboard</b> dan bagikan link itu, atau isi <code>SHEET_ID</code> di bagian atas skrip <code>index.html</code>.</p>
+</dialog>
+
+
+<script>
+/* ============ PENGATURAN (opsional) ============
+   Link Google Sheets biasanya ditempel lewat tombol "Sumber Data" di web.
+   Supaya SEMUA pengunjung langsung melihat data live, tulis ID spreadsheet
+   di SHEET_ID di bawah (bagian di antara /d/ dan /edit pada link Google Sheets). */
+window.PERSIB_CONFIG = {
+  SHEET_ID: "",
+  SHEET_NAMES: { data: "Data", kompetisi: "Kompetisi", info: "Info" },
+  CSV_URLS: { data: "", kompetisi: "", info: "" },
+  REFRESH_SECONDS: 60
+};
+/* ============ DATA BAWAAN (snapshot 4 Nov 2026) ============
+   Dipakai jika belum ada link Google Sheets atau sheet sedang tidak bisa dibuka. */
+window.PERSIB_DATA = {
+ "info": {
+  "tanggal_data": "2026-11-04",
+  "musim": "2026/27",
+  "sumber": "Transfermarkt (main, menit, gol) & FotMob (assist, kartu kuning: Liga, ACL Two, ASEAN; kuning ACL Two belum ada)",
+  "min_menit": 270,
+  "pemain_a": "Patricio Matricardi",
+  "pemain_b": "Danijel Loncar",
+  "catatan": [
+   "Kartu kuning ACL Two belum tersedia; jangan dibaca sebagai nol.",
+   "Kartu merah belum memiliki data sumber lengkap.",
+   "Data gol agregat dan per kompetisi dapat berbeda untuk pemain tertentu.",
+   "Clean sheet, saves, xG, xA, dan starter belum tersedia dalam file sumber."
+  ]
+ },
+ "players": [
+  {
+   "no": 1,
+   "nama": "Teja Paku Alam",
+   "pos": "GK",
+   "main": 8,
+   "menit": 720,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     4,
+     3,
+     1
+    ],
+    "menit": [
+     360,
+     270,
+     90
+    ]
+   }
+  },
+  {
+   "no": 2,
+   "nama": "Fitrah Maulana",
+   "pos": "GK",
+   "main": 6,
+   "menit": 540,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     4,
+     2,
+     0
+    ],
+    "menit": [
+     360,
+     180,
+     0
+    ]
+   }
+  },
+  {
+   "no": 3,
+   "nama": "Rhaka Syafaka",
+   "pos": "GK",
+   "main": 0,
+   "menit": 0,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     0,
+     0,
+     0
+    ],
+    "menit": [
+     0,
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "no": 4,
+   "nama": "Eliano Reijnders",
+   "pos": "DF",
+   "main": 12,
+   "menit": 1035,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     6,
+     5,
+     1
+    ],
+    "menit": [
+     495,
+     450,
+     90
+    ]
+   }
+  },
+  {
+   "no": 5,
+   "nama": "Sandy Walsh",
+   "pos": "DF",
+   "main": 7,
+   "menit": 455,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     4,
+     3,
+     0
+    ],
+    "menit": [
+     185,
+     270,
+     0
+    ]
+   }
+  },
+  {
+   "no": 6,
+   "nama": "Danijel Loncar",
+   "pos": "DF",
+   "main": 9,
+   "menit": 515,
+   "gol": 0,
+   "assist": 1,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — ACL2 0/1/-",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     1,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     5,
+     4,
+     0
+    ],
+    "menit": [
+     320,
+     195,
+     0
+    ]
+   }
+  },
+  {
+   "no": 7,
+   "nama": "Gabriel Mutombo",
+   "pos": "DF",
+   "main": 7,
+   "menit": 534,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 1,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — ASEAN 0/0/1",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     1
+    ],
+    "main": [
+     4,
+     2,
+     1
+    ],
+    "menit": [
+     278,
+     180,
+     76
+    ]
+   }
+  },
+  {
+   "no": 8,
+   "nama": "Patricio Matricardi",
+   "pos": "DF",
+   "main": 14,
+   "menit": 1187,
+   "gol": 1,
+   "assist": 0,
+   "kuning": 2,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — Liga 1/0/1; ASEAN 0/0/1",
+   "komp": {
+    "gol": [
+     1,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     1,
+     null,
+     1
+    ],
+    "main": [
+     8,
+     5,
+     1
+    ],
+    "menit": [
+     692,
+     405,
+     90
+    ]
+   }
+  },
+  {
+   "no": 9,
+   "nama": "Júlio César",
+   "pos": "DF",
+   "main": 12,
+   "menit": 684,
+   "gol": 2,
+   "assist": 0,
+   "kuning": 1,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — Liga 1/0/1; ACL2 1/0/-",
+   "komp": {
+    "gol": [
+     1,
+     1,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     1,
+     null,
+     0
+    ],
+    "main": [
+     6,
+     6,
+     1
+    ],
+    "menit": [
+     280,
+     314,
+     1
+    ]
+   }
+  },
+  {
+   "no": 10,
+   "nama": "Kakang Rudianto",
+   "pos": "DF",
+   "main": 8,
+   "menit": 482,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     4,
+     3,
+     1
+    ],
+    "menit": [
+     270,
+     211,
+     1
+    ]
+   }
+  },
+  {
+   "no": 11,
+   "nama": "Faris Abdul",
+   "pos": "DF",
+   "main": 0,
+   "menit": 0,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     0,
+     0,
+     0
+    ],
+    "menit": [
+     0,
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "no": 12,
+   "nama": "Kevin Pasha",
+   "pos": "DF",
+   "main": 0,
+   "menit": 0,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     0,
+     0,
+     0
+    ],
+    "menit": [
+     0,
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "no": 13,
+   "nama": "Thom Haye",
+   "pos": "MF",
+   "main": 13,
+   "menit": 778,
+   "gol": 1,
+   "assist": 3,
+   "kuning": 2,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — Liga 1/3/2",
+   "komp": {
+    "gol": [
+     1,
+     0,
+     0
+    ],
+    "assist": [
+     3,
+     0,
+     0
+    ],
+    "kuning": [
+     2,
+     null,
+     0
+    ],
+    "main": [
+     7,
+     5,
+     1
+    ],
+    "menit": [
+     467,
+     297,
+     14
+    ]
+   }
+  },
+  {
+   "no": 14,
+   "nama": "Gakuto Notsuda",
+   "pos": "MF",
+   "main": 2,
+   "menit": 163,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     0,
+     2,
+     0
+    ],
+    "menit": [
+     0,
+     163,
+     0
+    ]
+   }
+  },
+  {
+   "no": 15,
+   "nama": "Marc Klok",
+   "pos": "MF",
+   "main": 11,
+   "menit": 779,
+   "gol": 2,
+   "assist": 2,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — Liga 2/1/0; ACL2 0/1/-",
+   "komp": {
+    "gol": [
+     2,
+     0,
+     0
+    ],
+    "assist": [
+     1,
+     1,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     6,
+     4,
+     1
+    ],
+    "menit": [
+     445,
+     258,
+     76
+    ]
+   }
+  },
+  {
+   "no": 16,
+   "nama": "Berguinho",
+   "pos": "MF",
+   "main": 13,
+   "menit": 684,
+   "gol": 1,
+   "assist": 1,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — ACL2 0/1/-; ASEAN 1/0/0",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     1
+    ],
+    "assist": [
+     0,
+     1,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     8,
+     4,
+     1
+    ],
+    "menit": [
+     405,
+     189,
+     90
+    ]
+   }
+  },
+  {
+   "no": 17,
+   "nama": "Adam Alis",
+   "pos": "MF",
+   "main": 13,
+   "menit": 843,
+   "gol": 1,
+   "assist": 1,
+   "kuning": 1,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — Liga 1/1/0; ASEAN 0/0/1",
+   "komp": {
+    "gol": [
+     1,
+     0,
+     0
+    ],
+    "assist": [
+     1,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     1
+    ],
+    "main": [
+     7,
+     5,
+     1
+    ],
+    "menit": [
+     438,
+     338,
+     67
+    ]
+   }
+  },
+  {
+   "no": 18,
+   "nama": "Luciano Guaycochea",
+   "pos": "MF",
+   "main": 4,
+   "menit": 261,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 2,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — Liga 0/0/2",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     2,
+     null,
+     0
+    ],
+    "main": [
+     3,
+     1,
+     0
+    ],
+    "menit": [
+     192,
+     69,
+     0
+    ]
+   }
+  },
+  {
+   "no": 19,
+   "nama": "Dedi Kusnandar",
+   "pos": "MF",
+   "main": 9,
+   "menit": 239,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     6,
+     2,
+     1
+    ],
+    "menit": [
+     192,
+     24,
+     23
+    ]
+   }
+  },
+  {
+   "no": 20,
+   "nama": "Nazriel Alfaro",
+   "pos": "MF",
+   "main": 2,
+   "menit": 32,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     1,
+     1,
+     0
+    ],
+    "menit": [
+     1,
+     31,
+     0
+    ]
+   }
+  },
+  {
+   "no": 21,
+   "nama": "Mariano Peralta",
+   "pos": "FW",
+   "main": 14,
+   "menit": 785,
+   "gol": 5,
+   "assist": 4,
+   "kuning": 1,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — Liga 2/2/1; ACL2 1/1/-; ASEAN 1/1/0 · gol TM 5 vs 4 di 3 kompetisi (selisih kemungkinan di kompetisi ke-4)",
+   "komp": {
+    "gol": [
+     3,
+     1,
+     1
+    ],
+    "assist": [
+     2,
+     1,
+     1
+    ],
+    "kuning": [
+     1,
+     null,
+     0
+    ],
+    "main": [
+     8,
+     5,
+     1
+    ],
+    "menit": [
+     559,
+     212,
+     14
+    ]
+   }
+  },
+  {
+   "no": 22,
+   "nama": "Balša Sekulić",
+   "pos": "FW",
+   "main": 13,
+   "menit": 760,
+   "gol": 6,
+   "assist": 1,
+   "kuning": 1,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — Liga 3/0/1; ACL2 3/0/-; ASEAN 0/1/0",
+   "komp": {
+    "gol": [
+     3,
+     3,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     1
+    ],
+    "kuning": [
+     1,
+     null,
+     0
+    ],
+    "main": [
+     7,
+     5,
+     1
+    ],
+    "menit": [
+     396,
+     341,
+     23
+    ]
+   }
+  },
+  {
+   "no": 23,
+   "nama": "Ragnar Oratmangoen",
+   "pos": "FW",
+   "main": 7,
+   "menit": 259,
+   "gol": 0,
+   "assist": 1,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — Liga 0/1/0",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     1,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     4,
+     3,
+     0
+    ],
+    "menit": [
+     109,
+     150,
+     0
+    ]
+   }
+  },
+  {
+   "no": 24,
+   "nama": "Beckham Putra",
+   "pos": "FW",
+   "main": 7,
+   "menit": 214,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 1,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — Liga 0/0/1",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     1,
+     null,
+     0
+    ],
+    "main": [
+     5,
+     2,
+     0
+    ],
+    "menit": [
+     187,
+     27,
+     0
+    ]
+   }
+  },
+  {
+   "no": 25,
+   "nama": "Luka Menalo",
+   "pos": "FW",
+   "main": 13,
+   "menit": 608,
+   "gol": 4,
+   "assist": 3,
+   "kuning": 1,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — Liga 2/2/1; ACL2 1/0/-; ASEAN 1/1/0",
+   "komp": {
+    "gol": [
+     2,
+     1,
+     1
+    ],
+    "assist": [
+     2,
+     0,
+     1
+    ],
+    "kuning": [
+     1,
+     null,
+     0
+    ],
+    "main": [
+     8,
+     4,
+     1
+    ],
+    "menit": [
+     339,
+     179,
+     90
+    ]
+   }
+  },
+  {
+   "no": 26,
+   "nama": "Uilliam",
+   "pos": "FW",
+   "main": 11,
+   "menit": 708,
+   "gol": 2,
+   "assist": 1,
+   "kuning": 1,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — Liga 2/1/1",
+   "komp": {
+    "gol": [
+     2,
+     0,
+     0
+    ],
+    "assist": [
+     1,
+     0,
+     0
+    ],
+    "kuning": [
+     1,
+     null,
+     0
+    ],
+    "main": [
+     8,
+     2,
+     1
+    ],
+    "menit": [
+     550,
+     91,
+     67
+    ]
+   }
+  },
+  {
+   "no": 27,
+   "nama": "Febri Hariyadi",
+   "pos": "FW",
+   "main": 0,
+   "menit": 0,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     0,
+     0,
+     0
+    ],
+    "menit": [
+     0,
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "no": 28,
+   "nama": "Ikhwan Tanamal",
+   "pos": "FW",
+   "main": 8,
+   "menit": 585,
+   "gol": 0,
+   "assist": 1,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · G/A/K per kompetisi — Liga 0/1/0",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     1,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     5,
+     2,
+     1
+    ],
+    "menit": [
+     371,
+     124,
+     90
+    ]
+   }
+  },
+  {
+   "no": 29,
+   "nama": "Athaya Zahran",
+   "pos": "FW",
+   "main": 0,
+   "menit": 0,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     0,
+     0,
+     0
+    ],
+    "menit": [
+     0,
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "no": 30,
+   "nama": "Rafi Rasyiq",
+   "pos": "FW",
+   "main": 0,
+   "menit": 0,
+   "gol": 0,
+   "assist": 0,
+   "kuning": 0,
+   "merah": 0,
+   "catatan": "Main, menit, gol: Transfermarkt · assist/kuning: 0 di 3 kompetisi",
+   "komp": {
+    "gol": [
+     0,
+     0,
+     0
+    ],
+    "assist": [
+     0,
+     0,
+     0
+    ],
+    "kuning": [
+     0,
+     null,
+     0
+    ],
+    "main": [
+     0,
+     0,
+     0
+    ],
+    "menit": [
+     0,
+     0,
+     0
+    ]
+   }
+  }
+ ]
+};
+</script>
+<script>
+(function(){
+'use strict';
+
+/* =====================================================================
+   1. KONFIGURASI & KONSTANTA
+   ===================================================================== */
+const CFG = Object.assign({SHEET_ID:'',SHEET_NAMES:{data:'Data',kompetisi:'Kompetisi',info:'Info'},CSV_URLS:{},REFRESH_SECONDS:60}, window.PERSIB_CONFIG||{});
+CFG.SHEET_NAMES = Object.assign({data:'Data',kompetisi:'Kompetisi',info:'Info'}, CFG.SHEET_NAMES||{});
+CFG.CSV_URLS = CFG.CSV_URLS || {};
+const REFRESH = Math.max(15, +CFG.REFRESH_SECONDS || 60);
+const FALLBACK = window.PERSIB_DATA || {info:{},players:[]};
+
+const POS_ORDER = ['GK','DF','MF','FW'];
+const POS_NAME  = {GK:'Kiper',DF:'Bek',MF:'Gelandang',FW:'Penyerang'};
+const COMPS = [{n:'Super League',s:'Liga'},{n:'ACL Two',s:'ACL Two'},{n:'ASEAN',s:'ASEAN'}];
+const C = {blue:'#0A3FB0',sky:'#2F7BFF',navy:'#050D2B',gold:'#F5B800',green:'#16A34A',red:'#E11D48',mut:'#5B6B94',light:'#9DBDFF'};
+
+/* =====================================================================
+   2. UTIL
+   ===================================================================== */
+const $  = (s,r)=> (r||document).querySelector(s);
+const $$ = (s,r)=> Array.from((r||document).querySelectorAll(s));
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const slug = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const normKey = s => String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+const nf0 = new Intl.NumberFormat('id-ID',{maximumFractionDigits:0});
+const nf2 = new Intl.NumberFormat('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fInt = v => v==null?'-':nf0.format(v);
+const f2   = v => v==null?'-':nf2.format(v);
+const initials = n => String(n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+const posChip = p => `<span class="pos ${esc(p)}">${esc(p)}</span>`;
+const trunc = (s,px,cw)=>{const m=Math.max(4,Math.floor(px/(cw||6.6)));s=String(s);return s.length>m?s.slice(0,m-1)+'…':s};
+
+/* foto: coba webp > png > jpg > jpeg, kalau tidak ada tampilkan inisial */
+const EXT=['png','webp','jpg','jpeg'];
+const MISS = new Set();
+window.imgErr = function(img){
+  const i=(+img.dataset.e||0)+1;
+  if(i<EXT.length){img.dataset.e=i;img.src=img.dataset.b+'.'+EXT[i];}
+  else { MISS.add(img.dataset.b); img.remove(); }
+};
+const av = (name,cls) => { const b='assets/foto/'+slug(name); return `<span class="av ${cls}"><span>${esc(initials(name))}</span>${MISS.has(b)?'':`<img src="${b}.png" data-b="${b}" data-e="0" alt="" loading="lazy" onerror="imgErr(this)">`}</span>`; };
+
+/* =====================================================================
+   3. PEMBACA CSV (Google Sheets)
+   ===================================================================== */
+function parseCSV(t){
+  const rows=[]; let row=[], f='', q=false;
+  t=String(t).replace(/^\uFEFF/,'');
+  for(let i=0;i<t.length;i++){
+    const c=t[i];
+    if(q){ if(c==='"'){ if(t[i+1]==='"'){f+='"';i++;} else q=false; } else f+=c; }
+    else if(c==='"') q=true;
+    else if(c===','){ row.push(f); f=''; }
+    else if(c==='\n'||c==='\r'){ if(c==='\r'&&t[i+1]==='\n') i++; row.push(f); f=''; rows.push(row); row=[]; }
+    else f+=c;
+  }
+  if(f!==''||row.length){ row.push(f); rows.push(row); }
+  return rows.filter(r=>r.some(c=>String(c).trim()!==''));
+}
+function num(v,nullable){
+  if(v==null) return nullable?null:0;
+  let s=String(v).trim().replace(/\s/g,'');
+  if(s==='') return nullable?null:0;
+  if(/^-?\d{1,3}(\.\d{3})+$/.test(s)) s=s.replace(/\./g,''); else s=s.replace(',','.');
+  const n=parseFloat(s);
+  return isFinite(n)?n:(nullable?null:0);
+}
+function findCol(heads,test){ for(let i=0;i<heads.length;i++){ if(test(heads[i])) return i; } return -1; }
+
+function sheetsToRaw(texts){
+  const dRows=parseCSV(texts.data); if(dRows.length<2) throw new Error('Sheet Data kosong');
+  const H=dRows[0].map(normKey);
+  const ix={
+    nama:findCol(H,h=>h.includes('nama')||h==='pemain'), pos:findCol(H,h=>h.includes('posisi')),
+    main:findCol(H,h=>h==='main'||h.includes('penampilan')), menit:findCol(H,h=>h==='menit'),
+    gol:findCol(H,h=>h==='gol'), assist:findCol(H,h=>h==='assist'),
+    kuning:findCol(H,h=>h.includes('kuning')), merah:findCol(H,h=>h.includes('merah')), cat:findCol(H,h=>h.includes('catatan'))
+  };
+  if(ix.nama<0||ix.pos<0) throw new Error('Kolom Nama Pemain/Posisi tidak ditemukan di sheet Data');
+  const g=(r,i)=> i<0?'':r[i];
+
+  /* kompetisi */
+  const kmap={};
+  if(texts.kompetisi){
+    const kRows=parseCSV(texts.kompetisi);
+    if(kRows.length>1){
+      const KH=kRows[0].map(normKey);
+      const nameI=Math.max(0,findCol(KH,h=>h==='pemain'||h.includes('nama')));
+      const compTest=[h=>/super|liga|^.+sl$/.test(h), h=>h.includes('acl'), h=>h.includes('asean')];
+      const cols={};
+      ['gol','assist','kuning','main','menit'].forEach(m=>{
+        cols[m]=compTest.map(t=>findCol(KH,h=>h.startsWith(m)&&t(h.slice(m.length))));
+      });
+      kRows.slice(1).forEach(r=>{
+        const nm=String(r[nameI]||'').trim(); if(!nm) return;
+        const o={};
+        ['gol','assist','kuning','main','menit'].forEach(m=>{
+          o[m]=cols[m].map(ci=> ci<0?null:num(r[ci],true));
+        });
+        ['gol','assist','main','menit'].forEach(m=>{ o[m]=o[m].map(v=>v==null?0:v); });
+        kmap[normKey(nm)]=o;
+      });
+    }
+  }
+  const players=[];
+  dRows.slice(1).forEach(r=>{
+    const nama=String(g(r,ix.nama)||'').trim(); if(!nama) return;
+    players.push({
+      nama, pos:String(g(r,ix.pos)||'').trim().toUpperCase(),
+      main:num(g(r,ix.main)), menit:num(g(r,ix.menit)), gol:num(g(r,ix.gol)), assist:num(g(r,ix.assist)),
+      kuning:num(g(r,ix.kuning)), merah:num(g(r,ix.merah)), catatan:String(g(r,ix.cat)||''),
+      komp:kmap[normKey(nama)]||null
+    });
+  });
+
+  /* info */
+  const info={catatan:[]};
+  if(texts.info){
+    const iRows=parseCSV(texts.info);
+    const cat=[];
+    iRows.slice(1).forEach(r=>{
+      const k=normKey(r[0]), v=String(r[1]==null?'':r[1]).trim(); if(!k||v==='') return;
+      const m=k.match(/^catatan(\d*)$/);
+      if(m) cat.push([+m[1]||0,v]); else info[k.replace(/(.)_/g,'$1')]=v;
+    });
+    info.catatan=cat.sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+  }
+  /* key info dinormalkan (tanggal_data -> tanggaldata) */
+  const I={
+    tanggal_data:info.tanggaldata, musim:info.musim, sumber:info.sumber,
+    min_menit:info.minmenit, pemain_a:info.pemaina, pemain_b:info.pemainb, catatan:info.catatan
+  };
+  return {info:I, players};
+}
+
+/* =====================================================================
+   4. MODEL DATA & PERHITUNGAN
+   ===================================================================== */
+function build(raw){
+  const base = FALLBACK.info||{};
+  const info = {
+    tanggal_data: raw.info.tanggal_data || base.tanggal_data || '',
+    musim: raw.info.musim || base.musim || '2026/27',
+    sumber: raw.info.sumber || base.sumber || '',
+    min_menit: raw.info.min_menit!=null&&raw.info.min_menit!=='' ? num(raw.info.min_menit) : (base.min_menit!=null?num(base.min_menit):270),
+    pemain_a: raw.info.pemain_a || base.pemain_a || '',
+    pemain_b: raw.info.pemain_b || base.pemain_b || '',
+    catatan: (raw.info.catatan&&raw.info.catatan.length)?raw.info.catatan:(base.catatan||[])
+  };
+  const players = raw.players.map((p,i)=>{
+    const o = Object.assign({},p,{idx:i});
+    o.ga = o.gol+o.assist;
+    o.gol90 = o.menit>0 ? o.gol/o.menit*90 : null;
+    o.ga90  = o.menit>0 ? o.ga/o.menit*90 : null;
+    o.ast90 = o.menit>0 ? o.assist/o.menit*90 : null;
+    o.gaMain= o.main>0 ? o.ga/o.main : null;
+    return o;
+  });
+  return {info,players};
+}
+function top(list,keys,filter,n){
+  return list.filter(filter).sort((a,b)=>{
+    for(const k of keys){ const d=k(b)-k(a); if(d) return d; }
+    return a.idx-b.idx;
+  }).slice(0,n);
+}
+const sum = (list,f)=> list.reduce((s,p)=>s+(f(p)||0),0);
+function dateText(s){
+  s=String(s||'').trim(); if(!s) return '';
+  let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m) return `${m[3].padStart(2,'0')}/${m[2].padStart(2,'0')}/${m[1]}`;
+  m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+  if(m) return `${m[1].padStart(2,'0')}/${m[2].padStart(2,'0')}/${m[3]}`;
+  return s;
+}
+const compSum = (p,m)=>{ const a=p.komp&&p.komp[m]; return a? a.reduce((s,v)=>s+(v||0),0) : null; };
+
+/* =====================================================================
+   5. GRAFIK SVG (tanpa library)
+   ===================================================================== */
+const REG = {};  let regN=0;
+function chartBox(spec,h){ const id='c'+(++regN); REG[id]=spec; return `<div class="chart" data-chart="${id}"${h?` style="min-height:${h}px"`:''}></div>`; }
+
+function scaleOf(max){
+  max=Math.max(max,1); let step=1;
+  outer: for(let e=0;e<7;e++){ for(const m of [1,2,5]){ const s=m*Math.pow(10,e); if(max/s<=5){step=s;break outer;} } }
+  const topV=Math.ceil(max/step)*step, t=[]; for(let v=0;v<=topV+1e-9;v+=step) t.push(v);
+  return {top:topV,t};
+}
+function smooth(pts,yMin,yMax){
+  if(pts.length<2) return '';
+  const cl=y=>Math.min(yMax,Math.max(yMin,y));
+  let d=`M${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
+    d+=`C${(p1.x+(p2.x-p0.x)/6).toFixed(1)},${cl(p1.y+(p2.y-p0.y)/6).toFixed(1)} ${(p2.x-(p3.x-p1.x)/6).toFixed(1)},${cl(p2.y-(p3.y-p1.y)/6).toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
+  return d;
+}
+function legendHTML(items){
+  return `<div class="legend">${items.map(i=>`<span><i class="${i.line?'l':''}" style="background:${i.color}"></i>${esc(i.name)}</span>`).join('')}</div>`;
+}
+
+/* --- batang horizontal --- */
+function drawHBar(el,s){
+  const W=Math.max(220,el.clientWidth), rowH=36, padT=4, n=s.items.length;
+  if(!n){ el.innerHTML='<div class="empty">Belum ada data</div>'; return; }
+  const labW=Math.min(150,Math.round(W*.4)), padR=50, bw=W-labW-padR, H=padT+n*rowH+4;
+  const max=Math.max(...s.items.map(i=>i.value),1e-9);
+  let o=`<svg class="svg-chart" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(s.title)}">`;
+  s.items.forEach((it,i)=>{
+    const y=padT+i*rowH, w=Math.max(3,it.value/max*bw);
+    o+=`<g class="h"><title>${esc(it.label)}: ${esc(s.fmt(it.value))}</title>
+      <text class="lab" x="0" y="${y+rowH/2+4}">${esc(trunc(it.label,labW))}</text>
+      <rect class="track" x="${labW}" y="${y+7}" width="${bw}" height="${rowH-14}" rx="7"/>
+      <rect class="bar" x="${labW}" y="${y+7}" width="${w.toFixed(1)}" height="${rowH-14}" rx="7" fill="url(#${i===0?'gGold':'gBlue'})" style="animation-delay:${i*70}ms"/>
+      <text class="val" x="${(labW+w+8).toFixed(1)}" y="${y+rowH/2+4}">${esc(s.fmt(it.value))}</text></g>`;
+  });
+  el.innerHTML=o+'</svg>';
+}
+
+/* --- batang vertikal berkelompok --- */
+function drawVGroup(el,s){
+  const W=Math.max(240,el.clientWidth), H=s.height||250, pl=34, pr=8, pt=12, pb=30;
+  const iw=W-pl-pr, ih=H-pt-pb;
+  const vals=s.series.flatMap(x=>x.values.filter(v=>v!=null));
+  const sc=scaleOf(Math.max(...vals,1));
+  const nC=s.cats.length, nS=s.series.length, gw=iw/nC, bw=Math.min(34,(gw*.72)/nS), gap=3;
+  const y=v=>pt+ih-(v/sc.top)*ih;
+  let o=legendHTML(s.series.map(x=>({name:x.name,color:x.color})));
+  o+=`<svg class="svg-chart" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(s.title)}">`;
+  sc.t.forEach(t=>{ o+=`<line class="grid" x1="${pl}" x2="${W-pr}" y1="${y(t)}" y2="${y(t)}"/><text class="ax" x="${pl-6}" y="${y(t)+4}" text-anchor="end">${fInt(t)}</text>`; });
+  s.cats.forEach((c,ci)=>{
+    const gx=pl+ci*gw+gw/2, tw=nS*bw+(nS-1)*gap;
+    s.series.forEach((se,si)=>{
+      const v=se.values[ci], x=gx-tw/2+si*(bw+gap);
+      if(v==null){ o+=`<text class="ax" x="${x+bw/2}" y="${y(0)-6}" text-anchor="middle">n/a</text>`; return; }
+      const hh=Math.max(v>0?3:0,(v/sc.top)*ih);
+      o+=`<g class="h"><title>${esc(c)} · ${esc(se.name)}: ${esc(s.fmt?s.fmt(v):fInt(v))}</title>
+        <rect class="vbar" x="${x.toFixed(1)}" y="${(y(0)-hh).toFixed(1)}" width="${bw.toFixed(1)}" height="${hh.toFixed(1)}" rx="5" fill="${se.fill||se.color}" style="animation-delay:${si*80+ci*40}ms"/>
+        <text class="val" x="${(x+bw/2).toFixed(1)}" y="${(y(0)-hh-5).toFixed(1)}" text-anchor="middle">${esc(s.fmt?s.fmt(v):fInt(v))}</text></g>`;
+    });
+    o+=`<text class="cat" x="${gx}" y="${H-9}" text-anchor="middle">${esc(trunc(c,gw,6.4))}</text>`;
+  });
+  el.innerHTML=o+'</svg>';
+}
+
+/* --- donat --- */
+function drawDonut(el,s){
+  const size=Math.min(300,Math.max(200,el.clientWidth)), cx=size/2, cy=size/2, r1=size*.46, r0=size*.27;
+  const total=s.items.reduce((a,b)=>a+b.value,0);
+  let o=`<svg class="svg-chart" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="${esc(s.title)}" style="margin:0 auto">`;
+  if(total<=0){
+    o+=`<circle cx="${cx}" cy="${cy}" r="${(r0+r1)/2}" fill="none" stroke="#E3EAF8" stroke-width="${r1-r0}"/>`;
+  } else {
+    let a=-Math.PI/2;
+    s.items.forEach(it=>{
+      if(it.value<=0) return;
+      const frac=it.value/total, a1=a+frac*Math.PI*2, mid=(a+a1)/2;
+      const P=(r,t)=>[cx+r*Math.cos(t),cy+r*Math.sin(t)];
+      let d;
+      if(frac>=.9999) d=`M${cx},${cy-r1}A${r1},${r1} 0 1 1 ${cx-.01},${cy-r1}Z M${cx},${cy-r0}A${r0},${r0} 0 1 0 ${cx-.01},${cy-r0}Z`;
+      else { const L=a1-a>Math.PI?1:0, A=P(r1,a),B=P(r1,a1),Cc=P(r0,a1),D=P(r0,a);
+        d=`M${A[0]},${A[1]}A${r1},${r1} 0 ${L} 1 ${B[0]},${B[1]}L${Cc[0]},${Cc[1]}A${r0},${r0} 0 ${L} 0 ${D[0]},${D[1]}Z`; }
+      o+=`<g class="h"><title>${esc(it.label)}: ${fInt(it.value)} gol (${(frac*100).toFixed(1).replace('.',',')}%)</title><path d="${d}" fill="${it.color}" stroke="#fff" stroke-width="2.5" fill-rule="evenodd"/></g>`;
+      if(frac>=.07){ const lp=P((r0+r1)/2,mid); o+=`<text x="${lp[0]}" y="${lp[1]+4}" text-anchor="middle" style="font-size:12.5px;font-weight:800;fill:${it.dark?'#3b2c00':'#fff'}">${Math.round(frac*100)}%</text>`; }
+      a=a1;
+    });
+  }
+  o+=`<text x="${cx}" y="${cy+4}" text-anchor="middle" style="font-size:${(size*.12).toFixed(0)}px;font-weight:800;fill:#0F1B3D">${fInt(total)}</text><text x="${cx}" y="${cy+size*.085+8}" text-anchor="middle" class="ax">total gol</text>`;
+  el.innerHTML=o+'</svg>';
+}
+
+/* --- kombinasi batang + kurva (kartu pemain) --- */
+function drawCombo(el,s){
+  const W=Math.max(260,el.clientWidth), H=s.height||210, pl=30, pr=40, pt=10, pb=28;
+  const iw=W-pl-pr, ih=H-pt-pb, nC=s.cats.length, gw=iw/nC;
+  const leftVals=[...s.bars.filter(b=>b.axis==='l').flatMap(b=>b.values),...s.lines.flatMap(l=>l.values)].filter(v=>v!=null);
+  const rightVals=s.bars.filter(b=>b.axis==='r').flatMap(b=>b.values).filter(v=>v!=null);
+  const L=scaleOf(Math.max(...leftVals,3)), Rr=scaleOf(Math.max(...rightVals,90));
+  const yl=v=>pt+ih-(v/L.top)*ih, yr=v=>pt+ih-(v/Rr.top)*ih;
+  const nb=s.bars.length, bw=Math.min(30,(gw*.62)/nb), gap=3;
+  let o=legendHTML([...s.bars.map(b=>({name:b.name,color:b.color})),...s.lines.map(l=>({name:l.name,color:l.color,line:1}))]);
+  o+=`<svg class="svg-chart" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(s.title)}">`;
+  L.t.forEach(t=>{ o+=`<line class="grid" x1="${pl}" x2="${W-pr}" y1="${yl(t)}" y2="${yl(t)}"/><text class="ax" x="${pl-6}" y="${yl(t)+4}" text-anchor="end">${fInt(t)}</text>`; });
+  Rr.t.forEach((t,i)=>{ if(i%1===0) o+=`<text class="ax" x="${W-pr+6}" y="${yr(t)+4}" fill="#9DBDFF" style="fill:#7C95C9">${fInt(t)}</text>`; });
+  s.cats.forEach((c,ci)=>{
+    const gx=pl+ci*gw+gw/2, tw=nb*bw+(nb-1)*gap;
+    s.bars.forEach((b,bi)=>{
+      const v=b.values[ci]; if(v==null) return;
+      const yy=b.axis==='r'?yr(v):yl(v), hh=Math.max(v>0?2:0,(pt+ih)-yy), x=gx-tw/2+bi*(bw+gap);
+      o+=`<g class="h"><title>${esc(c)} · ${esc(b.name)}: ${fInt(v)}</title><rect class="vbar" x="${x.toFixed(1)}" y="${(pt+ih-hh).toFixed(1)}" width="${bw.toFixed(1)}" height="${hh.toFixed(1)}" rx="5" fill="${b.fill||b.color}" style="animation-delay:${bi*90+ci*40}ms"/></g>`;
+    });
+    o+=`<text class="cat" x="${gx}" y="${H-8}" text-anchor="middle">${esc(trunc(c,gw,6.2))}</text>`;
+  });
+  s.lines.forEach(l=>{
+    const pts=l.values.map((v,i)=>v==null?null:{x:pl+i*gw+gw/2,y:yl(v),v});
+    let seg=[],segs=[]; pts.forEach(p=>{ if(p) seg.push(p); else { if(seg.length) segs.push(seg); seg=[]; } }); if(seg.length) segs.push(seg);
+    segs.forEach(sg=>{ if(sg.length>1){ const d=smooth(sg,pt,pt+ih); o+=`<path class="ln" d="${d}" pathLength="1" style="--len:1" fill="none" stroke="${l.color}" stroke-width="3" stroke-linecap="round"/>`; }});
+    pts.forEach((p,i)=>{ if(p) o+=`<g class="h"><title>${esc(s.cats[i])} · ${esc(l.name)}: ${fInt(p.v)}</title><circle cx="${p.x}" cy="${p.y}" r="5" fill="#fff" stroke="${l.color}" stroke-width="3"/></g>`; else o+=`<text class="ax" x="${pl+i*gw+gw/2}" y="${yl(0)-8}" text-anchor="middle">-</text>`; });
+  });
+  el.innerHTML=o+'</svg>';
+}
+
+function drawChart(el,force){
+  const spec=REG[el.dataset.chart]; if(!spec) return;
+  const w=el.clientWidth; if(!w) return;
+  if(!force && el._w===w && el.firstChild) return;
+  el._w=w;
+  ({hbar:drawHBar,vgroup:drawVGroup,donut:drawDonut,combo:drawCombo})[spec.type](el,spec);
+}
+function drawVisible(force){ $$('.chart[data-chart]').forEach(el=>{ if(el.offsetParent!==null) drawChart(el,force); }); }
+
+/* =====================================================================
+   6. RENDER
+   ===================================================================== */
+const S = {model:null, minMenit:null, cmpA:'', cmpB:'', kq:'', kpos:'ALL', dq:'', dpos:'ALL', sortEff:{k:'ga90',d:-1}, sortData:{k:'idx',d:1}, tab:'ringkasan', lastRaw:'', source:'local'};
+
+function kpi(label,val,cls){ return `<div class="card kpi ${cls||''}"><div class="l">${esc(label)}</div><div class="v">${val}</div></div>`; }
+
+function renderMeta(){
+  const m=S.model, d=dateText(m.info.tanggal_data);
+  $('#meta').innerHTML=`${d?`<span class="chip">📅 Data per <b>${esc(d)}</b></span>`:''}<span class="chip">🏆 Musim <b>${esc(m.info.musim)}</b></span><span class="chip">👥 <b>${m.players.length}</b> pemain</span>`;
+  $('#foot').innerHTML=`<p>Sumber: ${esc(m.info.sumber||'-')}</p><p style="margin-top:4px">Angka dihitung otomatis dari data pemain yang terisi; sel kosong dianggap 0. Dashboard ini tidak berafiliasi resmi dengan PERSIB Bandung.</p>`;
+}
+
+function rankCard(title,rows,cols,n){
+  const head=`<th class="rk">#</th><th>Pemain</th>`+cols.map(c=>`<th class="${c.c||'n'}">${esc(c.h)}</th>`).join('');
+  let body='';
+  for(let i=0;i<n;i++){
+    const p=rows[i];
+    if(!p){ body+=`<tr><td class="rk dim">${i+1}</td><td class="dim">-</td>${cols.map(c=>`<td class="${c.c||'n'} dim">-</td>`).join('')}</tr>`; continue; }
+    body+=`<tr class="r${i+1}"><td class="rk"><i>${i+1}</i></td><td><div class="pl">${av(p.nama,'sm')}<span>${esc(p.nama)}</span></div></td>${cols.map(c=>`<td class="${c.c||'n'}">${c.f(p)}</td>`).join('')}</tr>`;
+  }
+  return `<div class="card"><h3>${esc(title)}</h3><div class="tw"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div></div>`;
+}
+
+function renderRingkasan(){
+  const P=S.model.players;
+  $('#r-kpi').innerHTML=
+    kpi('Pemain Tercatat',fInt(P.length))+kpi('Total Gol',fInt(sum(P,p=>p.gol)),'gold')+kpi('Total Assist',fInt(sum(P,p=>p.assist)))+
+    kpi('Total Gol+Assist',fInt(sum(P,p=>p.ga)),'gold')+kpi('Kartu Kuning',fInt(sum(P,p=>p.kuning)))+kpi('Kartu Merah',fInt(sum(P,p=>p.merah)));
+
+  const R={
+    gol:top(P,[p=>p.gol,p=>p.assist],p=>p.gol>0,5),
+    assist:top(P,[p=>p.assist,p=>p.gol],p=>p.assist>0,5),
+    ga:top(P,[p=>p.ga,p=>p.gol],p=>p.ga>0,5),
+    menit:top(P,[p=>p.menit],p=>p.menit>0,5),
+    main:top(P,[p=>p.main],p=>p.main>0,5),
+    kuning:top(P,[p=>p.kuning,p=>p.merah],p=>p.kuning>0,5),
+    avg:top(P,[p=>p.gaMain||0,p=>p.gol],p=>(p.gaMain||0)>0,5)
+  };
+  S.R=R;
+  const spot=(t,p,txt,icon)=>`<div class="card spot">${p?av(p.nama,'lg'):`<span class="av lg">–</span>`}<div><div class="t">${icon} ${esc(t)}</div><div class="n">${p?esc(p.nama):'-'}</div><div class="s">${p?txt:'Belum ada data'}</div></div></div>`;
+  $('#r-sorotan').innerHTML=
+    spot('Top Skor',R.gol[0],R.gol[0]?`<b>${fInt(R.gol[0].gol)}</b> gol`:'','⚽')+
+    spot('Menit Bermain Terbanyak',R.menit[0],R.menit[0]?`<b>${fInt(R.menit[0].menit)}</b> menit · ${esc(R.menit[0].pos)}`:'','⏱️')+
+    spot('Main Terbanyak',R.main[0],R.main[0]?`<b>${fInt(R.main[0].main)}</b> penampilan · ${esc(R.main[0].pos)}`:'','👟');
+
+  const posCol={h:'Pos',c:'c',f:p=>posChip(p.pos)};
+  $('#r-rank').innerHTML=
+    rankCard('Top Skor',R.gol,[posCol,{h:'Gol',f:p=>`<span class="v">${fInt(p.gol)}</span>`}],5)+
+    rankCard('Top Assist',R.assist,[posCol,{h:'Assist',f:p=>`<span class="v">${fInt(p.assist)}</span>`}],5)+
+    rankCard('Top Gol+Assist',R.ga,[posCol,{h:'G+A',f:p=>`<span class="v">${fInt(p.ga)}</span>`}],5)+
+    rankCard('Menit Bermain Terbanyak',R.menit,[posCol,{h:'Menit',f:p=>`<span class="v">${fInt(p.menit)}</span>`}],5)+
+    rankCard('Main (Penampilan) Terbanyak',R.main,[posCol,{h:'Main',f:p=>`<span class="v">${fInt(p.main)}</span>`}],5)+
+    rankCard('Kartu Kuning Terbanyak',R.kuning,[posCol,{h:'Kuning',f:p=>`<span class="v">${fInt(p.kuning)}</span>`}],5)+
+    `<div class="card" style="grid-column:1/-1"><h3>Rata-rata G+A Tertinggi <small>(Gol + Assist) ÷ Penampilan</small></h3>${(()=>{
+      const cols=[posCol,{h:'Main',f:p=>fInt(p.main)},{h:'G+A',f:p=>fInt(p.ga)},{h:'G+A/Main',f:p=>`<span class="v">${f2(p.gaMain)}</span>`}];
+      const head=`<th class="rk">#</th><th>Pemain</th>`+cols.map(c=>`<th class="${c.c||'n'}">${c.h}</th>`).join('');
+      let body=''; for(let i=0;i<5;i++){ const p=R.avg[i];
+        body+= p?`<tr class="r${i+1}"><td class="rk"><i>${i+1}</i></td><td><div class="pl">${av(p.nama,'sm')}<span>${esc(p.nama)}</span></div></td>${cols.map(c=>`<td class="${c.c||'n'}">${c.f(p)}</td>`).join('')}</tr>`
+                :`<tr><td class="rk dim">${i+1}</td><td class="dim">-</td>${cols.map(c=>`<td class="${c.c||'n'} dim">-</td>`).join('')}</tr>`; }
+      return `<div class="tw"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div><p class="note">Rata-rata dihitung otomatis dari data pemain, tanpa batas minimal main.</p>`;
+    })()}</div>`;
+
+  const mk=(title,rows,fn,fmt)=>`<div class="card"><h3>${esc(title)}</h3>${chartBox({type:'hbar',title,fmt,items:rows.map(p=>({label:p.nama,value:fn(p)}))})}</div>`;
+  $('#r-charts').innerHTML=
+    mk('Top Skor (Gol)',R.gol,p=>p.gol,fInt)+mk('Top Assist',R.assist,p=>p.assist,fInt)+mk('Top Gol+Assist',R.ga,p=>p.ga,fInt)+
+    mk('Menit Bermain Terbanyak',R.menit,p=>p.menit,fInt)+mk('Main (Penampilan) Terbanyak',R.main,p=>p.main,fInt);
+
+  /* lini */
+  const colr={GK:'#8CA3D8',DF:'#F5B800',MF:'#2F7BFF',FW:'#0A3FB0'};
+  const lini=POS_ORDER.map(k=>({k,label:`${k} · ${POS_NAME[k]}`,value:sum(P.filter(p=>p.pos===k),p=>p.gol),color:colr[k],dark:k==='DF'}));
+  const tot=lini.reduce((a,b)=>a+b.value,0);
+  const best=lini.reduce((a,b)=>b.value>a.value?b:a,lini[0]);
+  $('#r-lini').innerHTML=`<div class="lini"><div>${chartBox({type:'donut',title:'Persentase gol per lini',items:lini},220)}</div>
+    <div><div class="tw"><table><thead><tr><th>Lini</th><th class="n">Gol</th><th class="n">%</th></tr></thead><tbody>
+    ${lini.map(l=>`<tr><td><span class="legend" style="margin:0"><span><i style="background:${l.color}"></i>${esc(l.label)}</span></span></td><td class="n v">${fInt(l.value)}</td><td class="n">${tot?(l.value/tot*100).toFixed(1).replace('.',','):'0,0'}%</td></tr>`).join('')}
+    <tr class="tot"><td>Total</td><td class="n">${fInt(tot)}</td><td class="n">100%</td></tr></tbody></table></div>
+    <div class="insight">${tot?`Lini paling banyak mencetak gol: ${esc(best.label)} — ${fInt(best.value)} gol (${(best.value/tot*100).toFixed(1).replace('.',',')}%)`:'Belum ada gol tercatat.'}</div></div></div>`;
+}
+
+function renderAnalisisStatic(){
+  const P=S.model.players;
+  $('#a-kpi').innerHTML=kpi('Jumlah Pemain',fInt(P.length))+kpi('Total Gol',fInt(sum(P,p=>p.gol)),'gold')+kpi('Total Assist',fInt(sum(P,p=>p.assist)))+kpi('Gol + Assist',fInt(sum(P,p=>p.ga)),'gold')+kpi('Total Menit',fInt(sum(P,p=>p.menit)));
+
+  const pos=POS_ORDER.map(k=>{const L=P.filter(p=>p.pos===k);return {k,n:L.length,gol:sum(L,p=>p.gol),ast:sum(L,p=>p.assist)};});
+  $('#a-posisi').innerHTML=`<h3>Berdasarkan Posisi</h3><div class="tw"><table><thead><tr><th>Posisi</th><th class="n">Jumlah Pemain</th><th class="n">Gol</th><th class="n">Assist</th></tr></thead><tbody>
+    ${pos.map(r=>`<tr><td>${posChip(r.k)} <span class="dim" style="font-weight:600">${POS_NAME[r.k]}</span></td><td class="n">${fInt(r.n)}</td><td class="n v">${fInt(r.gol)}</td><td class="n v">${fInt(r.ast)}</td></tr>`).join('')}</tbody></table></div>
+    ${chartBox({type:'vgroup',title:'Gol dan Assist per Posisi',cats:POS_ORDER,series:[{name:'Gol',color:C.blue,fill:'url(#gBlueV)',values:pos.map(r=>r.gol)},{name:'Assist',color:C.gold,fill:'url(#gGoldV)',values:pos.map(r=>r.ast)}]},250)}`;
+
+  const withK=P.filter(p=>p.komp);
+  const cs=COMPS.map((c,i)=>{
+    const ks=withK.map(p=>p.komp.kuning[i]).filter(v=>v!=null);
+    return {n:c.n,gol:sum(withK,p=>p.komp.gol[i]),ast:sum(withK,p=>p.komp.assist[i]),kun:ks.length?ks.reduce((a,b)=>a+b,0):null};
+  });
+  $('#a-komp').innerHTML=`<h3>Perbandingan Kompetisi</h3><div class="tw"><table><thead><tr><th>Kompetisi</th><th class="n">Gol</th><th class="n">Assist</th><th class="n">Kartu Kuning</th></tr></thead><tbody>
+    ${cs.map(r=>`<tr><td style="font-weight:700">${esc(r.n)}</td><td class="n v">${fInt(r.gol)}</td><td class="n v">${fInt(r.ast)}</td><td class="n ${r.kun==null?'dim':'v'}">${r.kun==null?'Belum tersedia':fInt(r.kun)}</td></tr>`).join('')}</tbody></table></div>
+    ${chartBox({type:'vgroup',title:'Kontribusi per Kompetisi',cats:COMPS.map(c=>c.n),series:[{name:'Gol',color:C.blue,fill:'url(#gBlueV)',values:cs.map(r=>r.gol)},{name:'Assist',color:C.gold,fill:'url(#gGoldV)',values:cs.map(r=>r.ast)},{name:'Kartu Kuning',color:'#26418F',fill:'url(#gNavyV)',values:cs.map(r=>r.kun)}]},250)}`;
+
+  $('#a-notes').innerHTML=S.model.info.catatan.map(t=>`<li>${esc(t)}</li>`).join('')||'<li>Tidak ada catatan.</li>';
+}
+
+function renderRank(){
+  const P=S.model.players, min=S.minMenit;
+  const ok=p=>p.menit>0&&p.menit>=min;
+  const g90=top(P,[p=>p.gol90||0],ok,10), a90=top(P,[p=>p.ga90||0],ok,10);
+  const tbl=(rows,hv,fv)=>`<div class="tw"><table><thead><tr><th class="rk">#</th><th>Pemain</th><th class="c">Pos</th><th class="n">Menit</th><th class="n">${hv}</th></tr></thead><tbody>
+    ${rows.length?rows.map((p,i)=>`<tr class="r${i+1}"><td class="rk"><i>${i+1}</i></td><td><div class="pl">${av(p.nama,'sm')}<span>${esc(p.nama)}</span></div></td><td class="c">${posChip(p.pos)}</td><td class="n">${fInt(p.menit)}</td><td class="n v">${f2(fv(p))}</td></tr>`).join(''):`<tr><td colspan="5" class="empty">Tidak ada pemain yang memenuhi batas ${fInt(min)} menit</td></tr>`}</tbody></table></div>`;
+  const card=(t,rows,hv,fv)=>`<div class="card"><h3>${t}</h3>${chartBox({type:'hbar',title:t,fmt:f2,items:rows.map(p=>({label:p.nama,value:fv(p)}))})}${tbl(rows,hv,fv)}</div>`;
+  $('#a-rank').innerHTML=card('Top 10 Gol / 90 Menit',g90,'Gol/90',p=>p.gol90)+card('Top 10 Gol+Assist / 90 Menit',a90,'G+A/90',p=>p.ga90);
+}
+
+function renderCompare(){
+  const P=S.model.players; if(P.length<1){ $('#a-cmp').innerHTML='<div class="empty">Belum ada pemain</div>'; return; }
+  const A=P.find(p=>p.nama===S.cmpA)||P[0], B=P.find(p=>p.nama===S.cmpB)||P[Math.min(1,P.length-1)];
+  const rows=[['Posisi',p=>posChip(p.pos),null],['Penampilan',p=>fInt(p.main),p=>p.main],['Menit',p=>fInt(p.menit),p=>p.menit],['Gol',p=>fInt(p.gol),p=>p.gol],['Assist',p=>fInt(p.assist),p=>p.assist],['Gol + Assist',p=>fInt(p.ga),p=>p.ga],['Kartu Kuning',p=>fInt(p.kuning),null],['Gol/90',p=>f2(p.gol90),p=>p.gol90],['G+A/90',p=>f2(p.ga90),p=>p.ga90],['Assist/90',p=>f2(p.ast90),p=>p.ast90]];
+  const cell=(p,q,r)=>{ const w=r[2]&&(r[2](p)||0)>(r[2](q)||0); return `<td class="n ${w?'win':''}">${r[1](p)}</td>`; };
+  $('#a-cmp').innerHTML=`<div class="cmpHead"><div class="cmpP">${av(A.nama,'cmp')}<div><div class="nm">${esc(A.nama)}</div>${posChip(A.pos)}</div></div><div class="cmpP b">${av(B.nama,'cmp')}<div><div class="nm">${esc(B.nama)}</div>${posChip(B.pos)}</div></div></div>
+  <div class="grid g2" style="align-items:start"><div class="tw"><table><thead><tr><th>Metrik</th><th class="n">${esc(A.nama)}</th><th class="n">${esc(B.nama)}</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr><td style="font-weight:700">${r[0]}</td>${cell(A,B,r)}${cell(B,A,r)}</tr>`).join('')}</tbody></table></div>
+  <div>${chartBox({type:'vgroup',title:'Perbandingan dua pemain',cats:['Gol','Assist','Gol+Assist','Kuning'],series:[{name:A.nama,color:C.blue,fill:'url(#gBlueV)',values:[A.gol,A.assist,A.ga,A.kuning]},{name:B.nama,color:C.gold,fill:'url(#gGoldV)',values:[B.gol,B.assist,B.ga,B.kuning]}]},260)}<p class="note">Sel kuning pada tabel menandai nilai yang lebih tinggi.</p></div></div>`;
+}
+
+function sortList(list,k,d,get){
+  return list.slice().sort((a,b)=>{ const x=get(a,k),y=get(b,k); if(x==null&&y==null) return a.idx-b.idx; if(x==null) return 1; if(y==null) return -1; if(typeof x==='string') return d*x.localeCompare(y,'id'); return d*(x-y)||a.idx-b.idx; });
+}
+function sortHead(cols,st,tag){
+  return `<tr>${cols.map(c=>`<th class="sort ${c.c||''}" data-sort="${tag}:${c.k}" ${st.k===c.k?`data-d="${st.d}"`:''}>${c.h}</th>`).join('')}</tr>`;
+}
+function renderEff(){
+  const P=S.model.players, st=S.sortEff;
+  const cols=[{k:'nama',h:'Pemain',c:''},{k:'pos',h:'Posisi',c:'c'},{k:'main',h:'Main',c:'n'},{k:'menit',h:'Menit',c:'n'},{k:'gol90',h:'Gol/90',c:'n'},{k:'ast90',h:'Assist/90',c:'n'},{k:'ga90',h:'G+A/90',c:'n'}];
+  const rows=sortList(P,st.k,st.d,(p,k)=>p[k]);
+  $('#a-eff').innerHTML=`<table><thead>${sortHead(cols,st,'eff')}</thead><tbody>${rows.map(p=>`<tr><td><div class="pl">${av(p.nama,'sm')}<span>${esc(p.nama)}</span></div></td><td class="c">${posChip(p.pos)}</td><td class="n">${fInt(p.main)}</td><td class="n">${fInt(p.menit)}</td><td class="n">${f2(p.gol90)}</td><td class="n">${f2(p.ast90)}</td><td class="n v">${f2(p.ga90)}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function filterPlayers(q,pos){
+  q=normKey(q);
+  return S.model.players.filter(p=>(pos==='ALL'||p.pos===pos)&&(!q||normKey(p.nama).includes(q)));
+}
+function renderKurva(){
+  const L=filterPlayers(S.kq,S.kpos);
+  if(!L.length){ $('#k-grid').innerHTML='<div class="card empty" style="grid-column:1/-1">Tidak ada pemain yang cocok</div>'; return; }
+  $('#k-grid').innerHTML=L.map(p=>{
+    const k=p.komp;
+    const cell=(m,i)=>{ const v=k[m][i]; return v==null?'<span class="dim">-</span>':fInt(v); };
+    const tot=m=>fInt(compSum(p,m));
+    let body;
+    if(k){
+      const kunUnknown=k.kuning.some(v=>v==null);
+      body=`<div class="tw"><table><thead><tr><th></th>${COMPS.map(c=>`<th class="n">${c.s}</th>`).join('')}<th class="n">Total</th></tr></thead><tbody>
+        <tr><td><b>Gol</b></td>${COMPS.map((c,i)=>`<td class="n">${cell('gol',i)}</td>`).join('')}<td class="n v">${tot('gol')}</td></tr>
+        <tr><td><b>Assist</b></td>${COMPS.map((c,i)=>`<td class="n">${cell('assist',i)}</td>`).join('')}<td class="n v">${tot('assist')}</td></tr>
+        <tr><td><b>Kuning</b></td>${COMPS.map((c,i)=>`<td class="n">${cell('kuning',i)}</td>`).join('')}<td class="n v">${tot('kuning')}${kunUnknown?'*':''}</td></tr>
+        <tr class="tot"><td>G+A</td>${COMPS.map((c,i)=>`<td class="n">${fInt(k.gol[i]+k.assist[i])}</td>`).join('')}<td class="n">${fInt(compSum(p,'gol')+compSum(p,'assist'))}</td></tr></tbody></table></div>
+        ${chartBox({type:'combo',title:'Kurva performa '+p.nama,cats:COMPS.map(c=>c.n),bars:[{name:'Penampilan',color:C.blue,fill:'url(#gBlueV)',axis:'l',values:k.main},{name:'Menit (sumbu kanan)',color:C.light,fill:'url(#gSkyV)',axis:'r',values:k.menit}],lines:[{name:'Gol',color:C.gold,values:k.gol},{name:'Assist',color:C.green,values:k.assist},{name:'Kuning',color:C.red,values:k.kuning}]},215)}`;
+    } else body=`<div class="empty">Data per kompetisi belum diisi di sheet Kompetisi.</div>`;
+    return `<article class="card pc"><div class="hd">${av(p.nama,'cd')}<div><div class="nm">${esc(p.nama)}</div><div class="sub">${posChip(p.pos)} ${POS_NAME[p.pos]||''}</div><div class="big"><span>Main <b>${fInt(p.main)}</b></span><span><b>${fInt(p.menit)}</b> menit</span><span>G+A <b>${fInt(p.ga)}</b></span></div></div></div>${body}</article>`;
+  }).join('');
+}
+
+function chk(p){
+  if(!p.komp) return '<span class="dim">—</span>';
+  const g=compSum(p,'gol'), a=compSum(p,'assist'), k=p.komp.kuning.reduce((s,v)=>s+(v||0),0);
+  const diff=[g!==p.gol&&'gol',a!==p.assist&&'assist',k!==p.kuning&&'kuning'].filter(Boolean);
+  return diff.length?`<span class="bad">Beda: ${diff.join(', ')}</span>`:'<span class="ok">OK</span>';
+}
+function renderData(){
+  const st=S.sortData, L=filterPlayers(S.dq,S.dpos);
+  $('#d-sub').textContent=`${L.length} dari ${S.model.players.length} pemain`;
+  const cols=[{k:'idx',h:'No',c:'c'},{k:'nama',h:'Pemain'},{k:'pos',h:'Pos',c:'c'},{k:'main',h:'Main',c:'n'},{k:'menit',h:'Menit',c:'n'},{k:'gol',h:'Gol',c:'n'},{k:'assist',h:'Assist',c:'n'},{k:'ga',h:'G+A',c:'n'},{k:'kuning',h:'Kuning',c:'n'},{k:'merah',h:'Merah',c:'n'},{k:'gol90',h:'Gol/90',c:'n'},{k:'ga90',h:'G+A/90',c:'n'},{k:'chk',h:'Cek',c:'c'},{k:'catatan',h:'Catatan'}];
+  const rows=sortList(L,st.k,st.d,(p,k)=>k==='chk'?null:p[k]);
+  $('#d-body').innerHTML=`<table><thead>${sortHead(cols,st,'data')}</thead><tbody>${rows.map(p=>`<tr><td class="c dim">${p.idx+1}</td><td><div class="pl">${av(p.nama,'sm')}<span>${esc(p.nama)}</span></div></td><td class="c">${posChip(p.pos)}</td><td class="n">${fInt(p.main)}</td><td class="n">${fInt(p.menit)}</td><td class="n v">${fInt(p.gol)}</td><td class="n v">${fInt(p.assist)}</td><td class="n v">${fInt(p.ga)}</td><td class="n">${fInt(p.kuning)}</td><td class="n">${fInt(p.merah)}</td><td class="n">${f2(p.gol90)}</td><td class="n">${f2(p.ga90)}</td><td class="c">${chk(p)}</td><td style="min-width:260px;color:var(--mut);font-size:12.5px">${esc(p.catatan)}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function fillControls(){
+  const P=S.model.players, names=P.map(p=>p.nama);
+  const opt=(sel,cur)=>names.map(n=>`<option value="${esc(n)}"${n===cur?' selected':''}>${esc(n)}</option>`).join('');
+  if(!names.includes(S.cmpA)) S.cmpA=names.includes(S.model.info.pemain_a)?S.model.info.pemain_a:(names[0]||'');
+  if(!names.includes(S.cmpB)) S.cmpB=names.includes(S.model.info.pemain_b)?S.model.info.pemain_b:(names[1]||names[0]||'');
+  $('#cmpA').innerHTML=opt('#cmpA',S.cmpA); $('#cmpB').innerHTML=opt('#cmpB',S.cmpB);
+  const seg=(id,cur,tag)=>{ $(id).innerHTML=['ALL',...POS_ORDER].map(k=>`<button type="button" data-${tag}="${k}" aria-pressed="${cur===k}">${k==='ALL'?'Semua':k}</button>`).join(''); };
+  seg('#kPos',S.kpos,'kp'); seg('#dPos',S.dpos,'dp');
+  $('#minMenit').value=S.minMenit;
+}
+
+function renderAll(){
+  if(S.minMenit==null) S.minMenit=S.model.info.min_menit;
+  Object.keys(REG).forEach(k=>delete REG[k]);
+  fillControls(); renderMeta(); renderRingkasan(); renderAnalisisStatic(); renderRank(); renderCompare(); renderEff(); renderKurva(); renderData();
+  requestAnimationFrame(()=>drawVisible(true));
+}
+
+/* =====================================================================
+   7. AMBIL DATA (Google Sheets / cadangan lokal)
+   ===================================================================== */
+const LS_KEY='persib_sheet_id';
+function lsGet(){ try{return localStorage.getItem(LS_KEY)||'';}catch(e){return '';} }
+function lsSet(v){ try{ v?localStorage.setItem(LS_KEY,v):localStorage.removeItem(LS_KEY); }catch(e){} }
+function parseSheetInput(t){
+  t=String(t||'').trim(); if(!t) return {id:''};
+  if(/spreadsheets\/d\/e\//.test(t)) return {err:'Ini link “Publikasikan ke web”. Pakai link biasa dari tombol Bagikan (alamat yang ada /d/…/edit).'};
+  const m=t.match(/\/d\/([a-zA-Z0-9_-]{20,})/); if(m) return {id:m[1]};
+  if(/^[a-zA-Z0-9_-]{20,}$/.test(t)) return {id:t};
+  return {err:'Link tidak dikenali. Salin link Google Sheets lengkap dari kolom alamat browser.'};
+}
+function activeSheetId(){
+  const q=new URLSearchParams(location.search).get('sheet'); const fromQ=q?parseSheetInput(q).id:'';
+  return fromQ||lsGet()||String(CFG.SHEET_ID||'').trim();
+}
+function sourceUrls(){
+  const U=CFG.CSV_URLS;
+  if(U.data) return {mode:'csv',urls:{data:U.data,kompetisi:U.kompetisi||'',info:U.info||''}};
+  const sid=activeSheetId();
+  if(sid){
+    const id=encodeURIComponent(sid);
+    const u=n=>`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(CFG.SHEET_NAMES[n])}`;
+    return {mode:'gviz',urls:{data:u('data'),kompetisi:u('kompetisi'),info:u('info')}};
+  }
+  return null;
+}
+async function getText(u){
+  const r=await fetch(u+(u.includes('?')?'&':'?')+'_='+Date.now(),{cache:'no-store'});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return r.text();
+}
+function setPill(cls,txt){ const p=$('#pill'); p.className='pill '+cls; $('#pillTxt').textContent=txt; }
+const hhmmss=()=>new Date().toLocaleTimeString('id-ID',{hour12:false});
+
+async function refresh(manual){
+  const src=sourceUrls();
+  if(!src){
+    if(!S.model||S.source==='live'){ S.model=build(FALLBACK); S.lastRaw=JSON.stringify(FALLBACK); renderAll(); }
+    S.source='local';
+    setPill('','Data bawaan');
+    if(manual) toast('Belum ada link Google Sheets. Klik “Sumber Data” untuk menempelkannya.');
+    return;
+  }
+  setPill('busy','Memuat…');
+  try{
+    const [d,k,i]=await Promise.allSettled([getText(src.urls.data),src.urls.kompetisi?getText(src.urls.kompetisi):Promise.resolve(''),src.urls.info?getText(src.urls.info):Promise.resolve('')]);
+    if(d.status!=='fulfilled') throw d.reason;
+    const raw=sheetsToRaw({data:d.value,kompetisi:k.status==='fulfilled'?k.value:'',info:i.status==='fulfilled'?i.value:''});
+    if(!raw.players.length) throw new Error('Tidak ada pemain di sheet Data');
+    const sig=JSON.stringify(raw);
+    S.source='live';
+    if(sig!==S.lastRaw){ S.lastRaw=sig; S.model=build(raw); renderAll(); if(manual||S.loadedOnce) toast('Data diperbarui dari Google Sheets'); }
+    else if(!S.model){ S.model=build(raw); renderAll(); }
+    S.loadedOnce=true;
+    setPill('live','LIVE · '+hhmmss());
+  }catch(e){
+    console.warn('[Persib] gagal memuat Google Sheets:',e);
+    if(!S.model){ S.model=build(FALLBACK); S.lastRaw=JSON.stringify(FALLBACK); renderAll(); }
+    setPill('warn','Data cadangan · Sheets tidak terbaca');
+    if(manual) toast('Tidak bisa membaca Google Sheets. Cek link dan pengaturan berbagi (Pelihat).');
+  }
+}
+let toastT;
+function toast(t){ let e=$('.toast'); if(!e){ e=document.createElement('div'); e.className='toast'; e.setAttribute('role','status'); document.body.appendChild(e); } e.textContent=t; clearTimeout(toastT); toastT=setTimeout(()=>e.remove(),3800); }
+
+/* =====================================================================
+   8. INTERAKSI
+   ===================================================================== */
+function showTab(id,push){
+  if(!$('#tab-'+id)) id='ringkasan';
+  S.tab=id;
+  $$('section.tab').forEach(s=>s.hidden=s.id!=='tab-'+id);
+  $('#heroWrap').hidden=id!=='ringkasan';
+  $$('nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===id));
+  if(push!==false) history.replaceState(null,'','#'+id);
+  requestAnimationFrame(()=>drawVisible(false));
+}
+$$('nav button').forEach(b=>b.addEventListener('click',()=>{ showTab(b.dataset.tab); window.scrollTo({top:0,behavior:'smooth'}); }));
+$('#pill').addEventListener('click',()=>refresh(true));
+const dlg=$('#dlg'), shMsg=$('#shMsg');
+function msg(t,c){ shMsg.textContent=t; shMsg.className='dmsg '+(c||''); }
+$('#cfgBtn').addEventListener('click',()=>{ $('#shInput').value=activeSheetId()?('https://docs.google.com/spreadsheets/d/'+activeSheetId()+'/edit'):''; msg(activeSheetId()?'Terhubung ke sheet di atas.':'Belum ada link Google Sheets.',''); dlg.showModal(); });
+$('#shClose').addEventListener('click',()=>dlg.close());
+dlg.addEventListener('click',e=>{ if(e.target===dlg) dlg.close(); });
+$('#shSave').addEventListener('click',async()=>{
+  const r=parseSheetInput($('#shInput').value);
+  if(r.err){ msg(r.err,'err'); return; }
+  if(!r.id){ msg('Tempel link Google Sheets dulu.','err'); return; }
+  lsSet(r.id); S.loadedOnce=false; msg('Menghubungkan…','');
+  await refresh(true);
+  if(S.source==='live'){ msg('Berhasil terhubung. Dashboard akan memperbarui diri otomatis.','ok'); setTimeout(()=>dlg.close(),900); }
+  else msg('Belum bisa membaca sheet. Pastikan akses umum “Siapa saja yang memiliki link: Pelihat” dan tab bernama Data, Kompetisi, Info.','err');
+});
+$('#shReset').addEventListener('click',()=>{ lsSet(''); S.model=null; S.lastRaw=''; msg('Link dihapus, memakai data bawaan.','ok'); refresh(true); });
+$('#shCopy').addEventListener('click',async()=>{
+  const r=parseSheetInput($('#shInput').value);
+  if(r.err||!r.id){ msg(r.err||'Tempel link Google Sheets dulu.','err'); return; }
+  const u=location.origin+location.pathname+'?sheet='+r.id;
+  try{ await navigator.clipboard.writeText(u); msg('Link dashboard disalin. Bagikan link ini agar semua orang melihat data dari sheet Anda.','ok'); }
+  catch(e){ $('#shInput').value=u; $('#shInput').select(); msg('Salin link di kotak di atas.','ok'); }
+});
+$('#minMenit').addEventListener('input',e=>{ S.minMenit=Math.max(0,+e.target.value||0); renderRank(); requestAnimationFrame(()=>drawVisible(false)); });
+$('#cmpA').addEventListener('change',e=>{ S.cmpA=e.target.value; renderCompare(); requestAnimationFrame(()=>drawVisible(false)); });
+$('#cmpB').addEventListener('change',e=>{ S.cmpB=e.target.value; renderCompare(); requestAnimationFrame(()=>drawVisible(false)); });
+$('#kSearch').addEventListener('input',e=>{ S.kq=e.target.value; renderKurva(); requestAnimationFrame(()=>drawVisible(false)); });
+$('#dSearch').addEventListener('input',e=>{ S.dq=e.target.value; renderData(); });
+$('#kPos').addEventListener('click',e=>{ const b=e.target.closest('[data-kp]'); if(!b) return; S.kpos=b.dataset.kp; fillControls(); renderKurva(); requestAnimationFrame(()=>drawVisible(false)); });
+$('#dPos').addEventListener('click',e=>{ const b=e.target.closest('[data-dp]'); if(!b) return; S.dpos=b.dataset.dp; fillControls(); renderData(); });
+document.addEventListener('click',e=>{
+  const th=e.target.closest('th[data-sort]'); if(!th) return;
+  const [tag,k]=th.dataset.sort.split(':'), st=tag==='eff'?S.sortEff:S.sortData;
+  if(st.k===k) st.d*=-1; else { st.k=k; st.d=(k==='nama'||k==='pos'||k==='idx'||k==='catatan')?1:-1; }
+  tag==='eff'?renderEff():renderData();
+});
+let rz; window.addEventListener('resize',()=>{ clearTimeout(rz); rz=setTimeout(()=>drawVisible(false),150); });
+window.addEventListener('hashchange',()=>showTab(location.hash.slice(1),false));
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&sourceUrls()) refresh(false); });
+
+/* =====================================================================
+   9. MULAI
+   ===================================================================== */
+showTab(location.hash.slice(1)||'ringkasan',false);
+refresh(false);
+setInterval(()=>{ if(!document.hidden&&sourceUrls()) refresh(false); }, REFRESH*1000);
+window.__persib={S,refresh};  /* untuk debugging di console */
+})();
+</script>
+</body>
+</html>
